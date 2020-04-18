@@ -7,6 +7,12 @@ import paho.mqtt.client as mqtt
 import json
 import argparse
 
+ORG = "XXXXXX"                   # YOUR ORG ID      
+myauth="X-XXXXXX-XXXXXXXXXX"     # API key 
+mysecret="XXXXXXXXXXXXXXXXX"     # Authentication Token
+mydevice="YourDeviceName"        # Your Device Name
+mydeviceid="YourDeviceId"        # Your Device ID
+
 parser = argparse.ArgumentParser()
 parser.add_argument("echo")
 args = parser.parse_args()
@@ -24,7 +30,7 @@ def on_message(client, obj, msg):
         myd=detail_info()
         steps=myd['steps']
         meters=myd['meters']
-        mqttc.publish("iot-2/type/Raspberry/id/001/evt/steps/fmt/json",'{"d":{"steps":'+ str(steps)+',"meters":'+str(meters)+'}}')
+        mqttc.publish("iot-2/type/"+mydevice+"/id/"+mydeviceid+"/evt/steps/fmt/json",'{"d":{"steps":'+ str(steps)+',"meters":'+str(meters)+'}}')
         print(detail_info())
         time.sleep(1)
     elif(str(msg.payload.decode())[0:2]=="me"):
@@ -52,7 +58,7 @@ def custom_missed_call():
     
 def l(x):
     global mqttc
-    mqttc.publish("iot-2/type/Raspberry/id/001/evt/bpm/fmt/json",'{"d":{"value":'+ str(x)+'}}')
+    mqttc.publish("iot-2/type/"+mydevice+"/id/"+mydeviceid+"/evt/bpm/fmt/json",'{"d":{"value":'+ str(x)+'}}')
     print(str(x))
     time.sleep(1)
     a = 1/0
@@ -75,9 +81,9 @@ if len(sys.argv) > 2:
 else:
     band.authenticate()
     
-ORG = "tj8cfr"
-mqttc = mqtt.Client(client_id="a:tj8cfr:y3zhdy3zcj")
-sub="iot-2/type/Raspberry/id/001/cmd/status/fmt/json"
+
+mqttc = mqtt.Client(client_id=myauth.replace("-", ':'))
+sub="iot-2/type/"+mydevice+"/id/"+mydeviceid+"/cmd/status/fmt/json"
 
 while 1:
     try:
@@ -90,14 +96,14 @@ while 1:
 
         # Connect
         
-        mqttc.username_pw_set("a-tj8cfr-y3zhdy3zcj", "0sX7!UNQlo?u+TFbLZ")
+        mqttc.username_pw_set(myauth, mysecret)
         mqttc.connect(ORG+".messaging.internetofthings.ibmcloud.com", port=1883, keepalive=60)
 
         # Start subscribe, with QoS level 0
         mqttc.subscribe(sub, 0)
 
         # Publish a message
-        mqttc.publish("iot-2/type/Raspberry/id/001/evt/hello/fmt/json", "Hello from Covital Gateway")
+        mqttc.publish("iot-2/type/"+mydevice+"/id/"+mydeviceid+"/evt/hello/fmt/json", "Hello from Covital Gateway")
 
         # Continue the network loop, exit when an error occurs
         rc = 0
