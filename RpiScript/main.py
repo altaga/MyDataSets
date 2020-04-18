@@ -5,6 +5,11 @@ import time
 import os
 import paho.mqtt.client as mqtt
 import json
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("echo")
+args = parser.parse_args()
 
 # Define event callbacks
 def on_connect(client, userdata, flags, rc):
@@ -55,7 +60,8 @@ def l(x):
 def heart_beat():
     band.start_raw_data_realtime(heart_measure_callback=l)
     
-MAC_ADDR = "FA:34:13:91:38:03"
+
+MAC_ADDR = args.echo
 print('Attempting to connect to ', MAC_ADDR)
 band = MiBand3(MAC_ADDR, debug=True)
 band.setSecurityLevel(level = "medium")
